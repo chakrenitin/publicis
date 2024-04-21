@@ -1,27 +1,19 @@
 package com.publicis.demo.controller;
 
-import com.mashape.unirest.http.JsonNode;
+import com.publicis.demo.dto.ApiResponse;
+import com.publicis.demo.dto.ErrorResponse;
+import com.publicis.demo.dto.SuccessResponse;
 import com.publicis.demo.services.CoinDesk;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import com.publicis.demo.utilities.CurrencyUtil;
+import com.publicis.demo.utilities.Utility;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Locale;
 
 @RestController
 @RequestMapping("api/v1/bpi")
@@ -29,62 +21,34 @@ public class PriceByDateRange {
 
     @Autowired
     private CoinDesk coinDeskService;
-    @GetMapping("/historical")
-    public ResponseEntity<String> getPriceByRange(HttpServletRequest request, HttpServletResponse response) throws UnirestException {
+    @Autowired
+    private CurrencyUtil currencyUtil;
+
+    @GetMapping(value = "/historical" , produces="application/json")
+    public ResponseEntity<ApiResponse> getPriceByRange(@RequestParam(name = "startDate", defaultValue = "2000-01-01") String startDate, @RequestParam(name = "endDate", defaultValue = "2100-01-01") String endDate
+            , @RequestParam(name = "currency", defaultValue = "USD") String currency) {
         try {
 
-            String startDateStr = request.getParameter("startDate");
-            String endDateStr = request.getParameter("endDate");
-
-            Date startDate = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-                    .parse(startDateStr);
-            Date endDate = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-                    .parse(endDateStr);
-
-            JSONObject respObj = new JSONObject(coinDeskService.getHistoricData());
-
-           JSONObject bpi = respObj.getJSONObject("bpi");
-
-            Iterator<String> keys = bpi.keys();
-
-            Double max = Double.MIN_VALUE;
-            Double min = Double.MAX_VALUE;
-
-            String maxDate = "";
-            String minDate = "";
-            JSONObject finalRespObj = new JSONObject();
-
-            while(keys.hasNext()) {
-                String curDateStr = keys.next();
-                Date curDate = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
-                        .parse(curDateStr);
-                if(curDate.compareTo(startDate) >=0 && curDate.compareTo(endDate) <=0){
-                    Double curValue =  bpi.getDouble(curDateStr);
-                    if(curValue > max){
-                        max = curValue;
-                        maxDate = curDateStr;
-                    } else if(curValue < min){
-                        min = curValue;
-                        minDate = curDateStr;
-                    }
-                    finalRespObj.put(curDateStr,String.valueOf(curValue));
-                }
+            if(!Utility.isValidDateFormat(startDate,"yyyy-MM-dd") || !Utility.isValidDateFormat(endDate,"yyyy-MM-dd")){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("error","Invalid Date Format. Consider using yyyy-MM-dd"));
             }
 
-            String finalMaxValue = finalRespObj.getString(maxDate);
-            finalMaxValue += " " + "(high)";
+            if(!currencyUtil.currencyList.contains(currency)){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("error","Invalid Currency. Consider using USD, EUR or INR"));
+            }
 
-            String finalMinValue = finalRespObj.getString(minDate);
-            finalMinValue += " " + "(low)";
+            JSONObject coinDeskResponse = new JSONObject(coinDeskService.getHistoricData());
 
-            finalRespObj.put(maxDate, finalMaxValue);
-            finalRespObj.put(minDate, finalMinValue);
+            if(coinDeskResponse.getString("status").equals("error")){
+                return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(new ErrorResponse("error",coinDeskResponse.getString("message")));
+            }
 
+            JSONObject finalRespObj = Utility.filterOutPriceByDateRange(coinDeskResponse.getJSONObject("bpi"), startDate, endDate, currencyUtil.getMultiplicationFactor(currency));
 
-
-            return ResponseEntity.ok(finalRespObj.toString());
+            return ResponseEntity.ok(new SuccessResponse("success",finalRespObj));
         }catch (Exception e){
-            return ResponseEntity.status(500).body("Internal Server Error");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("error","Internal Server Error occurred"));
         }
     }
 

@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    tools{
+        maven 'maven_3_5_0'
+    }
+    stages{
+        stage('Build Maven'){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/chakrenitin/publicis']])
+                bat 'cd publicis && mvn clean install'
+            }
+        }
+        stage('Build DockerImage'){
+            steps{
+                script {
+                    bat 'cd publicis &&docker build -t publicis-bitcoin:1.0.0 .'
+                }
+            }
+        }
+    }
+}
