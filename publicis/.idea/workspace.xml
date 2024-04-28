@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9689831e-e38d-49c1-8228-6cedfd643b3a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/JenkinsPipelineScript" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/SwaggerConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/dto/ApiResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/dto/ErrorResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/dto/SuccessResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/utilities/CurrencyUtil.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/utilities/Utility.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/publicis/demo/controller/PriceByDateRange.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/controller/PriceByDateRange.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/publicis/demo/services/CoinDesk.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/publicis/demo/services/CoinDesk.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
-    </list>
+    <list default="true" id="9689831e-e38d-49c1-8228-6cedfd643b3a" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />

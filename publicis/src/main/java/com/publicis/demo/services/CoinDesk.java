@@ -22,6 +22,8 @@ public class CoinDesk {
     private CacheManager cacheManager;
 
     public String getHistoricData() throws UnirestException {
+
+        System.out.println("\nprint new build 1 \n");
         JSONObject response = new JSONObject();
         try {
             String cacheName = "historicData";
